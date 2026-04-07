@@ -1,6 +1,7 @@
 package edu.uga.cs.shoppinglist;
 
 import android.os.Bundle;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +10,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
+
+    Button loginButton;
+    Button registerButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,5 +24,8 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        registerButton = findViewById(R.id.register_button);
+        loginButton = findViewById(R.id.login_button);
     }
 }
