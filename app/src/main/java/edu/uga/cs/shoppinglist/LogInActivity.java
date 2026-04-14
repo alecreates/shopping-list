@@ -1,6 +1,8 @@
 package edu.uga.cs.shoppinglist;
 
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +11,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class LogInActivity extends AppCompatActivity {
+
+    EditText loginEmailEditText;
+    EditText loginPasswordEditText;
+    Button logInButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,5 +26,10 @@ public class LogInActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        loginEmailEditText = findViewById(R.id.loginEmailEditText);
+        loginPasswordEditText = findViewById(R.id.loginPasswordEditText);
+        logInButton = findViewById(R.id.loginButton);
     }
+
 }

@@ -49,13 +49,13 @@
         android:orientation="horizontal">
 
         <EditText
-            android:id="@+id/emailEditText"
+            android:id="@+id/registerEmailEditText"
             android:layout_width="300dp"
             android:layout_height="50dp"
             android:layout_weight="1"
             android:ems="10"
             android:hint="Email"
-            android:inputType="text" />
+            android:inputType="text|textEmailAddress" />
     </LinearLayout>
 
     <LinearLayout
@@ -66,13 +66,13 @@
         android:orientation="horizontal">
 
         <EditText
-            android:id="@+id/passwordEditText"
+            android:id="@+id/registerPasswordEditText"
             android:layout_width="300dp"
             android:layout_height="50dp"
             android:layout_weight="1"
             android:ems="10"
             android:hint="Password"
-            android:inputType="text"
+            android:inputType="text|textPassword"
             android:password="true" />
     </LinearLayout>
 
@@ -84,7 +84,7 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/registerButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
