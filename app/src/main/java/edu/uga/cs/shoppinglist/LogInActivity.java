@@ -1,5 +1,6 @@
 package edu.uga.cs.shoppinglist;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -48,34 +49,52 @@ public class LogInActivity extends AppCompatActivity {
         loginPasswordEditText = findViewById(R.id.loginPasswordEditText);
         logInButton = findViewById(R.id.loginButton);
 
+        mAuth = FirebaseAuth.getInstance();
+
         logInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String emailText = loginEmailEditText.getText().toString();
                 String passwordText = loginPasswordEditText.getText().toString();
-                mAuth = FirebaseAuth.getInstance();
 
-                mAuth.signInWithEmailAndPassword( emailText, passwordText )
-                        .addOnCompleteListener(LogInActivity.this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    // Sign in success, update UI with the signed-in user's information
-                                    Log.d( TAG, "signInWithEmail:success" );
-                                    FirebaseUser user = mAuth.getCurrentUser();
-                                }
-                                else {
-                                    // If sign in fails, display a message to the user.
-                                    Log.d( TAG, "signInWithEmail:failure", task.getException() );
-                                    Toast.makeText( LogInActivity.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
+                if (emailText.isEmpty() || passwordText.isEmpty()) {
+                    Toast.makeText(LogInActivity.this, "All fields required", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                loginUser(emailText, passwordText);
             }
         });
     }
 
+    private void loginUser(String email, String password) {
+        mAuth.signInWithEmailAndPassword( email, password )
+                .addOnCompleteListener(LogInActivity.this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d( TAG, "signInWithEmail:success" );
+                            FirebaseUser user = mAuth.getCurrentUser();
 
+                            // route to home page
+                            Intent intent = new Intent(LogInActivity.this, HomePageActivity.class);
+                            startActivity(intent);
 
+                            // success toast
+                            Toast.makeText( LogInActivity.this, "Login Successful!.",
+                                    Toast.LENGTH_SHORT).show();
+
+                            // finish activity
+                            finish();
+                        }
+                        else {
+                            // If sign in fails, display a message to the user.
+                            Log.d( TAG, "signInWithEmail:failure", task.getException() );
+                            Toast.makeText( LogInActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
 }
