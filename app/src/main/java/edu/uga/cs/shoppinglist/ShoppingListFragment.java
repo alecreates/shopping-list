@@ -21,20 +21,22 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import android.app.AlertDialog;
+import android.widget.EditText;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ShoppingListFragment extends Fragment {
 
     private static final String TAG = "ShoppingListFragment";
-    private EditText addItemEditText;
-    private Button addItemButton;
     private RecyclerView recyclerView;
     private ShoppingListAdapter adapter;
     private List<ShoppingItem> shoppingItemList;
     private DatabaseReference shoppingReference;
-
     private DatabaseReference purchasedReference;
+    private FloatingActionButton fabAddItem;
 
     public ShoppingListFragment() {
         super(R.layout.fragment_shopping_list);
@@ -45,9 +47,8 @@ public class ShoppingListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_shopping_list, container, false);
 
-        addItemEditText = view.findViewById(R.id.addItemEditText);
-        addItemButton = view.findViewById(R.id.addItemButton);
         recyclerView = view.findViewById(R.id.recyclerView);
+        fabAddItem = view.findViewById(R.id.fabAddItem);
 
         shoppingItemList = new ArrayList<>();
         adapter = new ShoppingListAdapter(shoppingItemList, item -> {
@@ -60,18 +61,33 @@ public class ShoppingListFragment extends Fragment {
         shoppingReference = FirebaseDatabase.getInstance().getReference("shopping_items");
         purchasedReference = FirebaseDatabase.getInstance().getReference("purchased_items");
 
-        addItemButton.setOnClickListener(v -> {
-            String itemName = addItemEditText.getText().toString().trim();
-            if (!itemName.isEmpty()) {
-                addItemToDatabase(itemName);
-            } else {
-                Toast.makeText(getContext(), "Please enter an item name", Toast.LENGTH_SHORT).show();
-            }
-        });
+        fabAddItem.setOnClickListener(v -> showAddItemDialog());
 
         loadShoppingItems();
 
         return view;
+    }
+
+    private void showAddItemDialog() {
+        EditText input = new EditText(getContext());
+        input.setHint("Enter item name");
+
+        new AlertDialog.Builder(getContext())
+                .setTitle("Add Item")
+                .setView(input)
+                .setPositiveButton("Add", (dialog, which) -> {
+                    String itemName = input.getText().toString().trim();
+
+                    if (!itemName.isEmpty()) {
+                        addItemToDatabase(itemName);
+                    } else {
+                        Toast.makeText(getContext(),
+                                "Item name cannot be empty",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void addItemToDatabase(String itemName) {
@@ -82,7 +98,6 @@ public class ShoppingListFragment extends Fragment {
         if (key != null) {
             shoppingReference.child(key).setValue(item)
                     .addOnSuccessListener(aVoid -> {
-                        addItemEditText.setText("");
                         Toast.makeText(getContext(), "Item added", Toast.LENGTH_SHORT).show();
                     })
                     .addOnFailureListener(e -> Log.e(TAG, "Failed to add item", e));
