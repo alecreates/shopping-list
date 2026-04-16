@@ -27,7 +27,7 @@ public class PurchasedListFragment extends Fragment {
     private RecyclerView recyclerView;
     private ShoppingListAdapter adapter;
     private List<ShoppingItem> purchasedItemList;
-    private DatabaseReference databaseReference;
+    private DatabaseReference purchasedReference;
 
     public PurchasedListFragment() {
         super(R.layout.fragment_purchased_list);
@@ -35,19 +35,21 @@ public class PurchasedListFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_purchased_list, container, false);
 
         recyclerView = view.findViewById(R.id.recyclerView);
 
         purchasedItemList = new ArrayList<>();
-        // Listener is null because we don't need to mark as purchased again in this fragment
-        adapter = new ShoppingListAdapter(purchasedItemList, null);
-        
+        adapter = new ShoppingListAdapter(purchasedItemList, null, true);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("shopping_items");
+        purchasedReference = FirebaseDatabase.getInstance().getReference("purchased_items");
 
         loadPurchasedItems();
 
@@ -55,16 +57,18 @@ public class PurchasedListFragment extends Fragment {
     }
 
     private void loadPurchasedItems() {
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        purchasedReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 purchasedItemList.clear();
+
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
                     ShoppingItem item = postSnapshot.getValue(ShoppingItem.class);
-                    if (item != null && item.isPurchased()) {
+                    if (item != null) {
                         purchasedItemList.add(item);
                     }
                 }
+
                 adapter.notifyDataSetChanged();
             }
 

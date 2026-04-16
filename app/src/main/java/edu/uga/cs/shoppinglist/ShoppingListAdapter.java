@@ -15,16 +15,19 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
     private List<ShoppingItem> shoppingItemList;
     private OnPurchasedClickListener listener;
+    private boolean isPurchasedList;
 
     public interface OnPurchasedClickListener {
         void onPurchasedClick(ShoppingItem item);
     }
 
-    public ShoppingListAdapter(List<ShoppingItem> shoppingItemList, OnPurchasedClickListener listener) {
+    public ShoppingListAdapter(List<ShoppingItem> shoppingItemList,
+                               OnPurchasedClickListener listener,
+                               boolean isPurchasedList) {
         this.shoppingItemList = shoppingItemList;
         this.listener = listener;
+        this.isPurchasedList = isPurchasedList;
     }
-
     @NonNull
     @Override
     public ShoppingItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -36,11 +39,14 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
     public void onBindViewHolder(@NonNull ShoppingItemViewHolder holder, int position) {
         ShoppingItem item = shoppingItemList.get(position);
         holder.itemNameTextView.setText(item.getItemName());
-        
-        if (item.isPurchased()) {
+
+        if (isPurchasedList) {
+            // hide button in purchased list
             holder.purchasedButton.setVisibility(View.GONE);
         } else {
+            // show button in shopping list
             holder.purchasedButton.setVisibility(View.VISIBLE);
+
             holder.purchasedButton.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onPurchasedClick(item);

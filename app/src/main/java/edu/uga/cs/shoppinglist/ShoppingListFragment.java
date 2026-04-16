@@ -32,7 +32,9 @@ public class ShoppingListFragment extends Fragment {
     private RecyclerView recyclerView;
     private ShoppingListAdapter adapter;
     private List<ShoppingItem> shoppingItemList;
-    private DatabaseReference databaseReference;
+    private DatabaseReference shoppingReference;
+
+    private DatabaseReference purchasedReference;
 
     public ShoppingListFragment() {
         super(R.layout.fragment_shopping_list);
@@ -50,12 +52,13 @@ public class ShoppingListFragment extends Fragment {
         shoppingItemList = new ArrayList<>();
         adapter = new ShoppingListAdapter(shoppingItemList, item -> {
             markItemAsPurchased(item);
-        });
+        }, false);
         
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("shopping_items");
+        shoppingReference = FirebaseDatabase.getInstance().getReference("shopping_items");
+        purchasedReference = FirebaseDatabase.getInstance().getReference("purchased_items");
 
         addItemButton.setOnClickListener(v -> {
             String itemName = addItemEditText.getText().toString().trim();
@@ -72,12 +75,12 @@ public class ShoppingListFragment extends Fragment {
     }
 
     private void addItemToDatabase(String itemName) {
-        String key = databaseReference.push().getKey();
+        String key = shoppingReference.push().getKey();
         ShoppingItem item = new ShoppingItem(itemName);
         item.setKey(key);
 
         if (key != null) {
-            databaseReference.child(key).setValue(item)
+            shoppingReference.child(key).setValue(item)
                     .addOnSuccessListener(aVoid -> {
                         addItemEditText.setText("");
                         Toast.makeText(getContext(), "Item added", Toast.LENGTH_SHORT).show();
@@ -87,21 +90,46 @@ public class ShoppingListFragment extends Fragment {
     }
 
     private void markItemAsPurchased(ShoppingItem item) {
-        if (item.getKey() != null) {
-            databaseReference.child(item.getKey()).child("purchased").setValue(true)
-                    .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Item marked as purchased", Toast.LENGTH_SHORT).show())
-                    .addOnFailureListener(e -> Log.e(TAG, "Failed to mark item as purchased", e));
-        }
+
+        if (item.getKey() == null) return;
+
+        String originalKey = item.getKey();
+        String newKey = purchasedReference.push().getKey();
+
+        // Copy item into purchased list
+        ShoppingItem purchasedItem = new ShoppingItem(item.getItemName());
+
+        purchasedItem.setKey(newKey);
+
+        // 1. Add to purchased_items
+        purchasedReference.child(newKey).setValue(purchasedItem)
+                .addOnSuccessListener(aVoid -> {
+
+                    // 2. Remove from shopping list
+                    shoppingReference.child(originalKey).removeValue()
+                            .addOnSuccessListener(v ->
+                                    Toast.makeText(getContext(),
+                                            "Moved to purchased items",
+                                            Toast.LENGTH_SHORT).show()
+                            )
+                            .addOnFailureListener(e ->
+                                    Log.e(TAG, "Failed to remove from shopping list", e)
+                            );
+
+                })
+                .addOnFailureListener(e ->
+                        Log.e(TAG, "Failed to add to purchased items", e)
+                );
     }
 
     private void loadShoppingItems() {
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        shoppingReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 shoppingItemList.clear();
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
                     ShoppingItem item = postSnapshot.getValue(ShoppingItem.class);
-                    if (item != null && !item.isPurchased()) {
+                    if (item != null) {
                         shoppingItemList.add(item);
                     }
                 }
