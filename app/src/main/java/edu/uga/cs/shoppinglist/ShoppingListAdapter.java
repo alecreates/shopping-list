@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,15 +15,16 @@ import java.util.List;
 public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ShoppingItemViewHolder> {
 
     private List<ShoppingItem> shoppingItemList;
-    private OnPurchasedClickListener listener;
+    private OnItemActionListener listener;
     private boolean isPurchasedList;
 
-    public interface OnPurchasedClickListener {
+    public interface OnItemActionListener {
         void onPurchasedClick(ShoppingItem item);
+        void onEditClick(ShoppingItem item);
+        void onDeleteClick(ShoppingItem item);
     }
-
     public ShoppingListAdapter(List<ShoppingItem> shoppingItemList,
-                               OnPurchasedClickListener listener,
+                               OnItemActionListener listener,
                                boolean isPurchasedList) {
         this.shoppingItemList = shoppingItemList;
         this.listener = listener;
@@ -43,13 +45,29 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         if (isPurchasedList) {
             // hide button in purchased list
             holder.purchasedButton.setVisibility(View.GONE);
+            holder.editButton.setVisibility(View.GONE);
+            holder.deleteButton.setVisibility(View.GONE);
         } else {
             // show button in shopping list
             holder.purchasedButton.setVisibility(View.VISIBLE);
+            holder.editButton.setVisibility(View.VISIBLE);
+            holder.deleteButton.setVisibility(View.VISIBLE);
 
             holder.purchasedButton.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onPurchasedClick(item);
+                }
+            });
+
+            holder.editButton.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onEditClick(item);
+                }
+            });
+
+            holder.deleteButton.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onDeleteClick(item);
                 }
             });
         }
@@ -62,12 +80,16 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
     static class ShoppingItemViewHolder extends RecyclerView.ViewHolder {
         TextView itemNameTextView;
-        Button purchasedButton;
+        ImageButton purchasedButton;
+        ImageButton editButton;
+        ImageButton deleteButton;
 
         public ShoppingItemViewHolder(@NonNull View itemView) {
             super(itemView);
             itemNameTextView = itemView.findViewById(R.id.itemName);
             purchasedButton = itemView.findViewById(R.id.purchasedButton);
+            editButton = itemView.findViewById(R.id.editButton);
+            deleteButton = itemView.findViewById(R.id.deleteButton);
         }
     }
 }

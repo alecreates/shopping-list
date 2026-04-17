@@ -2,10 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:padding="8dp"
     android:gravity="center_vertical">
 
+    <!-- Add to cart button (keeps same id for existing functionality) -->
+    <ImageButton
+        android:id="@+id/purchasedButton"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_outline_add_shopping_cart_24"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="?attr/colorOnSurface"
+        android:contentDescription="Add to cart"
+        android:padding="8dp" />
+
+    <!-- Item name -->
     <TextView
         android:id="@+id/itemName"
         android:layout_width="0dp"
@@ -13,11 +27,24 @@
         android:layout_weight="1"
         android:textSize="18sp" />
 
-    <Button
-        android:id="@+id/purchasedButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Purchased"
-        style="?attr/materialButtonOutlinedStyle" />
+    <!-- Edit icon button -->
+    <ImageButton
+        android:id="@+id/editButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@android:drawable/ic_menu_edit"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Edit Item"
+        android:layout_marginStart="8dp" />
+
+    <!-- Delete icon button -->
+    <ImageButton
+        android:id="@+id/deleteButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@android:drawable/ic_menu_delete"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Delete Item"
+        android:layout_marginStart="4dp" />
 
 </LinearLayout>
