@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -83,7 +84,7 @@ public class ShoppingListFragment extends Fragment {
 
                     @Override
                     public void onPurchasedClick(ShoppingItem item) {
-                        markItemAsPurchased(item);
+                        assignToMe(item);
                     }
 
                     @Override
@@ -96,7 +97,7 @@ public class ShoppingListFragment extends Fragment {
                         deleteItem(item);
                     }
                 },
-                false
+                ShoppingListAdapter.ListMode.SHOPPING
         );
         
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -279,6 +280,25 @@ public class ShoppingListFragment extends Fragment {
     }
 
     /**
+     * Assigns an item to the current user (moves it to their personal list).
+     *
+     * @param item The item being claimed by the user
+     */
+    private void assignToMe(ShoppingItem item) {
+        if (item.getKey() == null) return;
+
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        shoppingReference.child(item.getKey()).child("shopperId").setValue(userId)
+                .addOnSuccessListener(aVoid ->
+                        Toast.makeText(getContext(), "Added to your cart", Toast.LENGTH_SHORT).show()
+                )
+                .addOnFailureListener(e ->
+                        Log.e(TAG, "Failed to assign item", e)
+                );
+    }
+
+    /**
      * Moves an item from the shopping list to the purchased list in Firebase.
      *
      * <p>This method:
@@ -335,7 +355,7 @@ public class ShoppingListFragment extends Fragment {
                 shoppingItemList.clear();
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
                     ShoppingItem item = postSnapshot.getValue(ShoppingItem.class);
-                    if (item != null) {
+                    if (item != null && item.getShopperId() == null) {
                         shoppingItemList.add(item);
                     }
                 }

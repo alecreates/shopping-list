@@ -14,6 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ShoppingList">
         <activity
+            android:name=".PersonalListActivity"
+            android:exported="false"
+            android:label="My Cart"
+            android:parentActivityName=".HomePageActivity" />
+        <activity
             android:name=".HomePageActivity"
             android:exported="false" />
         <activity

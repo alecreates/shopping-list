@@ -16,7 +16,8 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
     private List<ShoppingItem> shoppingItemList;
     private OnItemActionListener listener;
-    private boolean isPurchasedList;
+    public enum ListMode { SHOPPING, PERSONAL, PURCHASED }
+    private ListMode mode;
 
     public interface OnItemActionListener {
         void onPurchasedClick(ShoppingItem item);
@@ -25,10 +26,10 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
     }
     public ShoppingListAdapter(List<ShoppingItem> shoppingItemList,
                                OnItemActionListener listener,
-                               boolean isPurchasedList) {
+                               ListMode mode) {
         this.shoppingItemList = shoppingItemList;
         this.listener = listener;
-        this.isPurchasedList = isPurchasedList;
+        this.mode = mode;
     }
     @NonNull
     @Override
@@ -42,33 +43,39 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         ShoppingItem item = shoppingItemList.get(position);
         holder.itemNameTextView.setText(item.getItemName());
 
-        if (isPurchasedList) {
-            // hide button in purchased list
+        if (mode == ListMode.PURCHASED) {
+            // hide all buttons in purchased list
             holder.purchasedButton.setVisibility(View.GONE);
             holder.editButton.setVisibility(View.GONE);
             holder.deleteButton.setVisibility(View.GONE);
-        } else {
-            // show button in shopping list
+        } else if (mode == ListMode.PERSONAL) {
+            // Personal list: only show purchased button (which actually marks as purchased)
+            // Edit/Delete are hidden as per requirements
             holder.purchasedButton.setVisibility(View.VISIBLE);
+            holder.purchasedButton.setImageResource(android.R.drawable.checkbox_on_background); // Change icon to indicate "complete"
+            holder.editButton.setVisibility(View.GONE);
+            holder.deleteButton.setVisibility(View.GONE);
+
+            holder.purchasedButton.setOnClickListener(v -> {
+                if (listener != null) listener.onPurchasedClick(item);
+            });
+        } else {
+            // Default shopping list: show all
+            holder.purchasedButton.setVisibility(View.VISIBLE);
+            holder.purchasedButton.setImageResource(R.drawable.ic_outline_add_shopping_cart_24);
             holder.editButton.setVisibility(View.VISIBLE);
             holder.deleteButton.setVisibility(View.VISIBLE);
 
             holder.purchasedButton.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onPurchasedClick(item);
-                }
+                if (listener != null) listener.onPurchasedClick(item);
             });
 
             holder.editButton.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onEditClick(item);
-                }
+                if (listener != null) listener.onEditClick(item);
             });
 
             holder.deleteButton.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onDeleteClick(item);
-                }
+                if (listener != null) listener.onDeleteClick(item);
             });
         }
     }

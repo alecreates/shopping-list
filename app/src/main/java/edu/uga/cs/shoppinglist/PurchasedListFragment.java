@@ -44,7 +44,7 @@ public class PurchasedListFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerView);
 
         purchasedItemList = new ArrayList<>();
-        adapter = new ShoppingListAdapter(purchasedItemList, null, true);
+        adapter = new ShoppingListAdapter(purchasedItemList, null, ShoppingListAdapter.ListMode.PURCHASED);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);

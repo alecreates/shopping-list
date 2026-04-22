@@ -86,8 +86,13 @@ public class HomePageActivity extends AppCompatActivity {
         if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        if (item.getItemId() == R.id.logout) {
+        int id = item.getItemId();
+        if (id == R.id.logout) {
             logout();
+            return true;
+        } else if (id == R.id.action_cart) {
+            Intent intent = new Intent(this, PersonalListActivity.class);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);

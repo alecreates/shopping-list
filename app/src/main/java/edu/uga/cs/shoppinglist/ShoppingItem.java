@@ -4,6 +4,7 @@ public class ShoppingItem {
 
     private String key;
     private String itemName;
+    private String shopperId;
 
     public ShoppingItem() {
         // Required for Firebase
@@ -11,6 +12,7 @@ public class ShoppingItem {
 
     public ShoppingItem(String itemName) {
         this.itemName = itemName;
+        this.shopperId = null;
     }
 
     public String getKey() {
@@ -27,5 +29,13 @@ public class ShoppingItem {
 
     public void setItemName(String itemName) {
         this.itemName = itemName;
+    }
+
+    public String getShopperId() {
+        return shopperId;
+    }
+
+    public void setShopperId(String shopperId) {
+        this.shopperId = shopperId;
     }
 }
