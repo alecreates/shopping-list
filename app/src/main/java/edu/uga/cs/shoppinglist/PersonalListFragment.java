@@ -5,8 +5,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.text.InputType;
+import android.widget.EditText;
 import android.widget.Toast;
-
+import androidx.appcompat.app.AlertDialog;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -34,13 +36,13 @@ public class PersonalListFragment extends Fragment {
     private String currentUserId;
 
     public PersonalListFragment() {
-        super(R.layout.fragment_purchased_list); // Reuse the same layout as purchased list
+        super(R.layout.fragment_personal_list);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_purchased_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_personal_list, container, false);
 
         recyclerView = view.findViewById(R.id.recyclerView);
         personalItemList = new ArrayList<>();
@@ -51,7 +53,7 @@ public class PersonalListFragment extends Fragment {
                 new ShoppingListAdapter.OnItemActionListener() {
                     @Override
                     public void onPurchasedClick(ShoppingItem item) {
-                        markItemAsPurchased(item);
+                        showPriceInputDialog(item);
                     }
 
                     @Override
@@ -74,7 +76,34 @@ public class PersonalListFragment extends Fragment {
         return view;
     }
 
-    private void markItemAsPurchased(ShoppingItem item) {
+    private void showPriceInputDialog(ShoppingItem item) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Enter Price for " + item.getItemName());
+
+        final EditText input = new EditText(getContext());
+        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        input.setHint("0.00");
+        builder.setView(input);
+
+        builder.setPositiveButton("Purchase", (dialog, which) -> {
+            String priceStr = input.getText().toString();
+            double price = 0.0;
+            if (!priceStr.isEmpty()) {
+                try {
+                    price = Double.parseDouble(priceStr);
+                } catch (NumberFormatException e) {
+                    Toast.makeText(getContext(), "Invalid price format", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+            markItemAsPurchased(item, price);
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    private void markItemAsPurchased(ShoppingItem item, double price) {
         if (item.getKey() == null) return;
 
         String originalKey = item.getKey();
@@ -82,6 +111,8 @@ public class PersonalListFragment extends Fragment {
 
         ShoppingItem purchasedItem = new ShoppingItem(item.getItemName());
         purchasedItem.setKey(newKey);
+        purchasedItem.setPrice(price);
+        purchasedItem.setShopperId(currentUserId);
 
         purchasedReference.child(newKey).setValue(purchasedItem)
                 .addOnSuccessListener(aVoid -> {

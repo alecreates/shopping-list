@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import java.util.Locale;
 
 public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ShoppingItemViewHolder> {
 
@@ -34,7 +35,8 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
     @NonNull
     @Override
     public ShoppingItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.shopping_item_row, parent, false);
+        int layoutId = (mode == ListMode.PURCHASED) ? R.layout.purchased_item_row : R.layout.shopping_item_row;
+        View view = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
         return new ShoppingItemViewHolder(view);
     }
 
@@ -44,39 +46,51 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         holder.itemNameTextView.setText(item.getItemName());
 
         if (mode == ListMode.PURCHASED) {
-            // hide all buttons in purchased list
-            holder.purchasedButton.setVisibility(View.GONE);
-            holder.editButton.setVisibility(View.GONE);
-            holder.deleteButton.setVisibility(View.GONE);
+            // hide all buttons in purchased list if they exist in the layout
+            if (holder.purchasedButton != null) holder.purchasedButton.setVisibility(View.GONE);
+            if (holder.editButton != null) holder.editButton.setVisibility(View.GONE);
+            if (holder.deleteButton != null) holder.deleteButton.setVisibility(View.GONE);
+
+            // Display price for purchased items
+            if (holder.itemPriceTextView != null) {
+                holder.itemPriceTextView.setVisibility(View.VISIBLE);
+                holder.itemPriceTextView.setText(String.format(Locale.US, "$%.2f", item.getPrice()));
+            }
         } else if (mode == ListMode.PERSONAL) {
             // Personal list: only show purchased button (which actually marks as purchased)
             // Edit/Delete are hidden as per requirements
-            holder.purchasedButton.setVisibility(View.VISIBLE);
-            holder.purchasedButton.setImageResource(android.R.drawable.checkbox_on_background); // Change icon to indicate "complete"
-            holder.editButton.setVisibility(View.GONE);
-            holder.deleteButton.setVisibility(View.GONE);
-
-            holder.purchasedButton.setOnClickListener(v -> {
-                if (listener != null) listener.onPurchasedClick(item);
-            });
+            if (holder.purchasedButton != null) {
+                holder.purchasedButton.setVisibility(View.VISIBLE);
+                holder.purchasedButton.setImageResource(android.R.drawable.checkbox_on_background); // Change icon to indicate "complete"
+                holder.purchasedButton.setOnClickListener(v -> {
+                    if (listener != null) listener.onPurchasedClick(item);
+                });
+            }
+            if (holder.editButton != null) holder.editButton.setVisibility(View.GONE);
+            if (holder.deleteButton != null) holder.deleteButton.setVisibility(View.GONE);
         } else {
             // Default shopping list: show all
-            holder.purchasedButton.setVisibility(View.VISIBLE);
-            holder.purchasedButton.setImageResource(R.drawable.ic_outline_add_shopping_cart_24);
-            holder.editButton.setVisibility(View.VISIBLE);
-            holder.deleteButton.setVisibility(View.VISIBLE);
+            if (holder.purchasedButton != null) {
+                holder.purchasedButton.setVisibility(View.VISIBLE);
+                holder.purchasedButton.setImageResource(R.drawable.ic_outline_add_shopping_cart_24);
+                holder.purchasedButton.setOnClickListener(v -> {
+                    if (listener != null) listener.onPurchasedClick(item);
+                });
+            }
 
-            holder.purchasedButton.setOnClickListener(v -> {
-                if (listener != null) listener.onPurchasedClick(item);
-            });
+            if (holder.editButton != null) {
+                holder.editButton.setVisibility(View.VISIBLE);
+                holder.editButton.setOnClickListener(v -> {
+                    if (listener != null) listener.onEditClick(item);
+                });
+            }
 
-            holder.editButton.setOnClickListener(v -> {
-                if (listener != null) listener.onEditClick(item);
-            });
-
-            holder.deleteButton.setOnClickListener(v -> {
-                if (listener != null) listener.onDeleteClick(item);
-            });
+            if (holder.deleteButton != null) {
+                holder.deleteButton.setVisibility(View.VISIBLE);
+                holder.deleteButton.setOnClickListener(v -> {
+                    if (listener != null) listener.onDeleteClick(item);
+                });
+            }
         }
     }
 
@@ -87,6 +101,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
     static class ShoppingItemViewHolder extends RecyclerView.ViewHolder {
         TextView itemNameTextView;
+        TextView itemPriceTextView;
         ImageButton purchasedButton;
         ImageButton editButton;
         ImageButton deleteButton;
@@ -94,6 +109,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         public ShoppingItemViewHolder(@NonNull View itemView) {
             super(itemView);
             itemNameTextView = itemView.findViewById(R.id.itemName);
+            itemPriceTextView = itemView.findViewById(R.id.itemPrice);
             purchasedButton = itemView.findViewById(R.id.purchasedButton);
             editButton = itemView.findViewById(R.id.editButton);
             deleteButton = itemView.findViewById(R.id.deleteButton);

@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -25,6 +27,7 @@ public class PurchasedListFragment extends Fragment {
 
     private static final String TAG = "PurchasedListFragment";
     private RecyclerView recyclerView;
+    private TextView totalPriceTextView;
     private ShoppingListAdapter adapter;
     private List<ShoppingItem> purchasedItemList;
     private DatabaseReference purchasedReference;
@@ -42,6 +45,7 @@ public class PurchasedListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_purchased_list, container, false);
 
         recyclerView = view.findViewById(R.id.recyclerView);
+        totalPriceTextView = view.findViewById(R.id.totalPrice);
 
         purchasedItemList = new ArrayList<>();
         adapter = new ShoppingListAdapter(purchasedItemList, null, ShoppingListAdapter.ListMode.PURCHASED);
@@ -61,15 +65,18 @@ public class PurchasedListFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 purchasedItemList.clear();
+                double total = 0.0;
 
                 for (DataSnapshot postSnapshot : snapshot.getChildren()) {
                     ShoppingItem item = postSnapshot.getValue(ShoppingItem.class);
                     if (item != null) {
                         purchasedItemList.add(item);
+                        total += item.getPrice();
                     }
                 }
 
                 adapter.notifyDataSetChanged();
+                totalPriceTextView.setText(String.format(java.util.Locale.US, "Total: $%.2f", total));
             }
 
             @Override
