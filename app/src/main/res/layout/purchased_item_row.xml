@@ -2,42 +2,55 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="8dp"
-    android:gravity="center_vertical">
+    android:orientation="vertical"
+    android:padding="8dp">
 
-    <TextView
-        android:id="@+id/itemName"
-        android:layout_width="0dp"
+    <!-- Top row -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="18sp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
+        <TextView
+            android:id="@+id/itemName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/itemPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/holo_green_dark"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/editButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_menu_edit"
+            android:background="@android:color/transparent" />
+
+        <ImageButton
+            android:id="@+id/deleteButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_menu_delete"
+            android:background="@android:color/transparent" />
+    </LinearLayout>
+
+    <!-- Bottom row -->
     <TextView
-        android:id="@+id/itemPrice"
-        android:layout_width="wrap_content"
+        android:id="@+id/itemDetails"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
-        android:textSize="16sp"
-        android:textColor="@android:color/holo_green_dark"
-        android:textStyle="bold" />
-
-    <ImageButton
-        android:id="@+id/editButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@android:drawable/ic_menu_edit"
-        android:background="@android:color/transparent"
-        android:contentDescription="Edit price"
-        android:padding="6dp" />
-
-    <ImageButton
-        android:id="@+id/deleteButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@android:drawable/ic_menu_delete"
-        android:background="@android:color/transparent"
-        android:contentDescription="Move back to shopping list"
-        android:padding="6dp" />
+        android:layout_marginTop="4dp"
+        android:textSize="14sp"
+        android:textColor="#666666" />
 
 </LinearLayout>

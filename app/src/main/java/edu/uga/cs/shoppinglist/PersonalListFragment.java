@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -141,19 +142,31 @@ public class PersonalListFragment extends Fragment {
         String originalKey = item.getKey();
         String newKey = purchasedReference.push().getKey();
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        String displayName = "Unknown User";
+        if (user != null && user.getDisplayName() != null) {
+            displayName = user.getDisplayName();
+        }
+
         ShoppingItem purchasedItem = new ShoppingItem(item.getItemName());
         purchasedItem.setKey(newKey);
         purchasedItem.setPrice(price);
         purchasedItem.setShopperId(currentUserId);
+        purchasedItem.setShopperName(displayName);
+        purchasedItem.setPurchasedDate(System.currentTimeMillis());
 
         purchasedReference.child(newKey).setValue(purchasedItem)
                 .addOnSuccessListener(aVoid -> {
                     shoppingReference.child(originalKey).removeValue()
                             .addOnSuccessListener(v ->
-                                    Toast.makeText(getContext(), "Item purchased!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(getContext(),
+                                            "Item purchased!",
+                                            Toast.LENGTH_SHORT).show()
                             );
                 })
-                .addOnFailureListener(e -> Log.e(TAG, "Failed to purchase item", e));
+                .addOnFailureListener(e ->
+                        Log.e(TAG, "Failed to purchase item", e));
     }
 
     private void loadPersonalItems() {

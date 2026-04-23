@@ -6,6 +6,8 @@ public class ShoppingItem {
     private String itemName;
     private String shopperId;
     private double price;
+    private String shopperName;
+    private long purchasedDate;
 
     public ShoppingItem() {
         // Required for Firebase
@@ -15,6 +17,8 @@ public class ShoppingItem {
         this.itemName = itemName;
         this.shopperId = null;
         this.price = 0.0;
+        this.shopperName = null;
+        this.purchasedDate = 0;
     }
 
     public String getKey() {
@@ -47,5 +51,21 @@ public class ShoppingItem {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public String getShopperName() {
+        return shopperName;
+    }
+
+    public void setShopperName(String shopperName) {
+        this.shopperName = shopperName;
+    }
+
+    public long getPurchasedDate() {
+        return purchasedDate;
+    }
+
+    public void setPurchasedDate(long purchasedDate) {
+        this.purchasedDate = purchasedDate;
     }
 }

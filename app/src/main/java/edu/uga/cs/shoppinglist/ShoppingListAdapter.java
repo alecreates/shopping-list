@@ -20,6 +20,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
     public enum ListMode { SHOPPING, PERSONAL, PURCHASED }
     private ListMode mode;
 
+
     public interface OnItemActionListener {
         void onPurchasedClick(ShoppingItem item);
         void onEditClick(ShoppingItem item);
@@ -46,29 +47,38 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         holder.itemNameTextView.setText(item.getItemName());
 
         if (mode == ListMode.PURCHASED) {
-            // hide all buttons in purchased list if they exist in the layout
-            if (holder.purchasedButton != null) holder.purchasedButton.setVisibility(View.GONE);
-            if (holder.editButton != null) {
-                holder.editButton.setVisibility(View.VISIBLE);
-
-                holder.editButton.setOnClickListener(v -> {
-                    if (listener != null) listener.onEditClick(item);
-                });
-            }
-
-            // display delete button to move items back to shopping list
-            if (holder.deleteButton != null) {
-                holder.deleteButton.setVisibility(View.VISIBLE);
-
-                holder.deleteButton.setOnClickListener(v -> {
-                    if (listener != null) listener.onDeleteClick(item);
-                });
-            }
-
-            // Display price for purchased items
             if (holder.itemPriceTextView != null) {
                 holder.itemPriceTextView.setVisibility(View.VISIBLE);
-                holder.itemPriceTextView.setText(String.format(Locale.US, "$%.2f", item.getPrice()));
+                holder.itemPriceTextView.setText(
+                        String.format(Locale.US, "$%.2f", item.getPrice())
+                );
+            }
+
+            if (holder.itemDetailsTextView != null) {
+
+                String shopper = item.getShopperName();
+                if (shopper == null || shopper.isEmpty()) {
+                    shopper = "Unknown";
+                }
+
+                String dateText = "Unknown date";
+
+                if (item.getPurchasedDate() != 0) {
+                    java.text.SimpleDateFormat sdf =
+                            new java.text.SimpleDateFormat(
+                                    "MM/dd/yyyy h:mm a",
+                                    Locale.US
+                            );
+
+                    dateText = sdf.format(
+                            new java.util.Date(item.getPurchasedDate())
+                    );
+                }
+
+                holder.itemDetailsTextView.setVisibility(View.VISIBLE);
+                holder.itemDetailsTextView.setText(
+                        "Purchased by " + shopper + " on " + dateText
+                );
             }
         } else if (mode == ListMode.PERSONAL) {
 
@@ -126,14 +136,19 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
     static class ShoppingItemViewHolder extends RecyclerView.ViewHolder {
         TextView itemNameTextView;
         TextView itemPriceTextView;
+        TextView itemDetailsTextView;   // ADD THIS
+
         ImageButton purchasedButton;
         ImageButton editButton;
         ImageButton deleteButton;
 
         public ShoppingItemViewHolder(@NonNull View itemView) {
             super(itemView);
+
             itemNameTextView = itemView.findViewById(R.id.itemName);
             itemPriceTextView = itemView.findViewById(R.id.itemPrice);
+            itemDetailsTextView = itemView.findViewById(R.id.itemDetails); // ADD THIS
+
             purchasedButton = itemView.findViewById(R.id.purchasedButton);
             editButton = itemView.findViewById(R.id.editButton);
             deleteButton = itemView.findViewById(R.id.deleteButton);
