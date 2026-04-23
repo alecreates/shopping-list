@@ -60,7 +60,7 @@ public class PersonalListFragment extends Fragment {
                     public void onEditClick(ShoppingItem item) {}
 
                     @Override
-                    public void onDeleteClick(ShoppingItem item) {}
+                    public void onDeleteClick(ShoppingItem item) { showMoveConfirmationDialog(item); }
                 },
                 ShoppingListAdapter.ListMode.PERSONAL
         );
@@ -74,6 +74,38 @@ public class PersonalListFragment extends Fragment {
         loadPersonalItems();
 
         return view;
+    }
+    private void showMoveConfirmationDialog(ShoppingItem item) {
+
+        new android.app.AlertDialog.Builder(getContext())
+                .setTitle("Move Item")
+                .setMessage("Are you sure you want to move \"" + item.getItemName() + "\" back to the shopping list?")
+                .setPositiveButton("Move", (dialog, which) -> {
+                    moveItemToShoppingList(item);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void moveItemToShoppingList(ShoppingItem item) {
+        if (item.getKey() == null) return;
+
+        String originalKey = item.getKey();
+
+        ShoppingItem movedItem = new ShoppingItem(item.getItemName());
+        movedItem.setKey(originalKey);      // keep same key
+        movedItem.setPrice(0.0);
+        movedItem.setShopperId(null);       // unassign from user
+
+        shoppingReference.child(originalKey).setValue(movedItem)
+                .addOnSuccessListener(aVoid ->
+                        Toast.makeText(getContext(),
+                                "Returned to shopping list",
+                                Toast.LENGTH_SHORT).show()
+                )
+                .addOnFailureListener(e ->
+                        Log.e(TAG, "Failed to move item back", e)
+                );
     }
 
     private void showPriceInputDialog(ShoppingItem item) {

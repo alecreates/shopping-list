@@ -57,17 +57,27 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
                 holder.itemPriceTextView.setText(String.format(Locale.US, "$%.2f", item.getPrice()));
             }
         } else if (mode == ListMode.PERSONAL) {
-            // Personal list: only show purchased button (which actually marks as purchased)
-            // Edit/Delete are hidden as per requirements
+
             if (holder.purchasedButton != null) {
                 holder.purchasedButton.setVisibility(View.VISIBLE);
-                holder.purchasedButton.setImageResource(android.R.drawable.checkbox_on_background); // Change icon to indicate "complete"
+                holder.purchasedButton.setImageResource(android.R.drawable.checkbox_on_background);
+
                 holder.purchasedButton.setOnClickListener(v -> {
                     if (listener != null) listener.onPurchasedClick(item);
                 });
             }
-            if (holder.editButton != null) holder.editButton.setVisibility(View.GONE);
-            if (holder.deleteButton != null) holder.deleteButton.setVisibility(View.GONE);
+
+            if (holder.editButton != null) {
+                holder.editButton.setVisibility(View.GONE);
+            }
+
+            if (holder.deleteButton != null) {
+                holder.deleteButton.setVisibility(View.VISIBLE);
+
+                holder.deleteButton.setOnClickListener(v -> {
+                    if (listener != null) listener.onDeleteClick(item);
+                });
+            }
         } else {
             // Default shopping list: show all
             if (holder.purchasedButton != null) {
