@@ -54,6 +54,20 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
                 );
             }
 
+            if (holder.editButton != null) {
+                holder.editButton.setVisibility(View.VISIBLE);
+                holder.editButton.setOnClickListener(v -> {
+                    if (listener != null) listener.onEditClick(item);
+                });
+            }
+
+            if (holder.deleteButton != null) {
+                holder.deleteButton.setVisibility(View.VISIBLE);
+                holder.deleteButton.setOnClickListener(v -> {
+                    if (listener != null) listener.onDeleteClick(item);
+                });
+            }
+
             if (holder.itemDetailsTextView != null) {
 
                 String shopper = item.getShopperName();
