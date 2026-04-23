@@ -15,12 +15,13 @@ public class HomePagerAdapter extends FragmentStateAdapter {
         switch (position) {
             case 0: return new ShoppingListFragment();
             case 1: return new PurchasedListFragment();
+            case 2: return new SummaryFragment();
             default: return new ShoppingListFragment();
         }
     }
 
     @Override
     public int getItemCount() {
-        return 2;
+        return 3;
     }
 }

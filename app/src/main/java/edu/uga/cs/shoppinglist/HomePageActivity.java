@@ -70,7 +70,8 @@ public class HomePageActivity extends AppCompatActivity {
         new TabLayoutMediator(tabLayout, viewPager,
                 (tab, position) -> {
                     if (position == 0) tab.setText("Shopping");
-                    else tab.setText("Purchased");
+                    else if (position == 1) tab.setText("Purchased");
+                    else tab.setText("Summary");
                 }
         ).attach();
     }
