@@ -31,6 +31,7 @@ public class PurchasedListFragment extends Fragment {
     private ShoppingListAdapter adapter;
     private List<ShoppingItem> purchasedItemList;
     private DatabaseReference purchasedReference;
+    private DatabaseReference shoppingReference;
 
     public PurchasedListFragment() {
         super(R.layout.fragment_purchased_list);
@@ -48,17 +49,70 @@ public class PurchasedListFragment extends Fragment {
         totalPriceTextView = view.findViewById(R.id.totalPrice);
 
         purchasedItemList = new ArrayList<>();
-        adapter = new ShoppingListAdapter(purchasedItemList, null, ShoppingListAdapter.ListMode.PURCHASED);
+        adapter = new ShoppingListAdapter(purchasedItemList,
+                new ShoppingListAdapter.OnItemActionListener() {
+                    @Override
+                    public void onPurchasedClick(ShoppingItem item) {}
+
+                    @Override
+                    public void onEditClick(ShoppingItem item) {}
+
+                    @Override
+                    public void onDeleteClick(ShoppingItem item) { showMoveConfirmationDialog(item); }
+                },
+                ShoppingListAdapter.ListMode.PURCHASED);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
         purchasedReference = FirebaseDatabase.getInstance().getReference("purchased_items");
+        shoppingReference = FirebaseDatabase.getInstance().getReference("shopping_items");
 
         loadPurchasedItems();
 
         return view;
     }
+
+    private void showMoveConfirmationDialog(ShoppingItem item) {
+
+        new android.app.AlertDialog.Builder(getContext())
+                .setTitle("Move Item")
+                .setMessage("Are you sure you want to move \"" + item.getItemName() + "\" back to the shopping list?")
+                .setPositiveButton("Move", (dialog, which) -> {
+                    moveItemToShoppingList(item);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void moveItemToShoppingList(ShoppingItem item) {
+        if (item.getKey() == null) return;
+
+        String purchasedKey = item.getKey();
+        String newShoppingKey = shoppingReference.push().getKey();
+
+        ShoppingItem movedItem = new ShoppingItem(item.getItemName());
+        movedItem.setKey(newShoppingKey);
+        movedItem.setPrice(0.0);
+        movedItem.setShopperId(null);
+
+        shoppingReference.child(newShoppingKey).setValue(movedItem)
+                .addOnSuccessListener(aVoid -> {
+
+                    purchasedReference.child(purchasedKey).removeValue()
+                            .addOnSuccessListener(v ->
+                                    android.widget.Toast.makeText(
+                                            getContext(),
+                                            "Moved back to shopping list",
+                                            android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+                            );
+                })
+                .addOnFailureListener(e ->
+                        Log.e(TAG, "Failed to move item", e)
+                );
+    }
+
 
     private void loadPurchasedItems() {
         purchasedReference.addValueEventListener(new ValueEventListener() {
