@@ -23,6 +23,15 @@
         android:textStyle="bold" />
 
     <ImageButton
+        android:id="@+id/editButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@android:drawable/ic_menu_edit"
+        android:background="@android:color/transparent"
+        android:contentDescription="Edit price"
+        android:padding="6dp" />
+
+    <ImageButton
         android:id="@+id/deleteButton"
         android:layout_width="40dp"
         android:layout_height="40dp"

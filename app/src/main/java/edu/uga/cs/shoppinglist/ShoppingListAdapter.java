@@ -48,7 +48,13 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         if (mode == ListMode.PURCHASED) {
             // hide all buttons in purchased list if they exist in the layout
             if (holder.purchasedButton != null) holder.purchasedButton.setVisibility(View.GONE);
-            if (holder.editButton != null) holder.editButton.setVisibility(View.GONE);
+            if (holder.editButton != null) {
+                holder.editButton.setVisibility(View.VISIBLE);
+
+                holder.editButton.setOnClickListener(v -> {
+                    if (listener != null) listener.onEditClick(item);
+                });
+            }
 
             // display delete button to move items back to shopping list
             if (holder.deleteButton != null) {

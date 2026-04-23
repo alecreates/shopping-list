@@ -20,6 +20,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import android.text.InputType;
+import android.widget.EditText;
+import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +60,7 @@ public class PurchasedListFragment extends Fragment {
                     public void onPurchasedClick(ShoppingItem item) {}
 
                     @Override
-                    public void onEditClick(ShoppingItem item) {}
+                    public void onEditClick(ShoppingItem item) { showEditPriceDialog(item); }
 
                     @Override
                     public void onDeleteClick(ShoppingItem item) { showMoveConfirmationDialog(item); }
@@ -71,6 +76,65 @@ public class PurchasedListFragment extends Fragment {
         loadPurchasedItems();
 
         return view;
+    }
+
+
+    private void showEditPriceDialog(ShoppingItem item) {
+        if (getContext() == null || item == null) return;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Edit Price");
+
+        final EditText input = new EditText(requireContext());
+        input.setInputType(InputType.TYPE_CLASS_NUMBER |
+                InputType.TYPE_NUMBER_FLAG_DECIMAL);
+
+        input.setHint("0.00");
+        input.setText(String.format(java.util.Locale.US, "%.2f", item.getPrice()));
+        input.setSelection(input.getText().length());
+
+        int padding = (int) (16 * getResources().getDisplayMetrics().density);
+        input.setPadding(padding, padding, padding, padding);
+
+        builder.setView(input);
+
+        builder.setPositiveButton("Save", (dialog, which) -> {
+            String priceText = input.getText().toString().trim();
+
+            if (priceText.isEmpty()) {
+                Toast.makeText(getContext(),
+                        "Enter a valid price",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            try {
+                double newPrice = Double.parseDouble(priceText);
+                updateItemPrice(item, newPrice);
+            } catch (NumberFormatException e) {
+                Toast.makeText(getContext(),
+                        "Invalid price format",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+    }
+
+    private void updateItemPrice(ShoppingItem item, double newPrice) {
+        if (item.getKey() == null) return;
+
+        purchasedReference.child(item.getKey())
+                .child("price")
+                .setValue(newPrice)
+                .addOnSuccessListener(aVoid ->
+                        Toast.makeText(getContext(),
+                                "Price updated",
+                                Toast.LENGTH_SHORT).show()
+                )
+                .addOnFailureListener(e ->
+                        Log.e(TAG, "Failed to update price", e));
     }
 
     private void showMoveConfirmationDialog(ShoppingItem item) {
