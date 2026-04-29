@@ -3,7 +3,6 @@ package edu.uga.cs.shoppinglist;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -13,6 +12,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * ShoppingListAdapter is a RecyclerView adapter responsible for displaying
+ * ShoppingItem objects in different list modes.
+ *
+ * It supports three display modes:
+ * - SHOPPING: general shopping list
+ * - PERSONAL: items assigned to the current user
+ * - PURCHASED: items that have been purchased
+ *
+ * The adapter also handles user actions such as:
+ * - Marking items as purchased
+ * - Editing items
+ * - Deleting or moving items
+ */
 public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ShoppingItemViewHolder> {
 
     private List<ShoppingItem> shoppingItemList;
@@ -21,11 +34,21 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
     private ListMode mode;
 
 
+    /**
+     * Interface defining actions that can be performed on items.
+     */
     public interface OnItemActionListener {
         void onPurchasedClick(ShoppingItem item);
         void onEditClick(ShoppingItem item);
         void onDeleteClick(ShoppingItem item);
     }
+    /**
+     * Constructs a ShoppingListAdapter.
+     *
+     * @param shoppingItemList list of items to display
+     * @param listener callback handler for item actions
+     * @param mode display mode controlling UI behavior
+     */
     public ShoppingListAdapter(List<ShoppingItem> shoppingItemList,
                                OnItemActionListener listener,
                                ListMode mode) {
@@ -33,6 +56,14 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         this.listener = listener;
         this.mode = mode;
     }
+
+    /**
+     * Inflates the appropriate row layout depending on list mode.
+     *
+     * @param parent parent ViewGroup
+     * @param viewType view type (unused)
+     * @return new ViewHolder instance
+     */
     @NonNull
     @Override
     public ShoppingItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -41,6 +72,17 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         return new ShoppingItemViewHolder(view);
     }
 
+    /**
+     * Binds data from a ShoppingItem to a ViewHolder.
+     *
+     * Behavior changes depending on ListMode:
+     * - PURCHASED: shows price, buyer info, edit/delete actions
+     * - PERSONAL: allows marking as purchased or deleting
+     * - SHOPPING: full interaction set
+     *
+     * @param holder ViewHolder for item
+     * @param position item position in list
+     */
     @Override
     public void onBindViewHolder(@NonNull ShoppingItemViewHolder holder, int position) {
         ShoppingItem item = shoppingItemList.get(position);
@@ -142,11 +184,20 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         }
     }
 
+    /**
+     * Returns total number of items in the dataset.
+     *
+     * @return item count
+     */
     @Override
     public int getItemCount() {
         return shoppingItemList.size();
     }
 
+    /**
+     * ViewHolder class that holds references to UI components
+     * for a single shopping item row.
+     */
     static class ShoppingItemViewHolder extends RecyclerView.ViewHolder {
         TextView itemNameTextView;
         TextView itemPriceTextView;
@@ -156,6 +207,11 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         ImageButton editButton;
         ImageButton deleteButton;
 
+        /**
+         * Constructs a ViewHolder and binds UI components.
+         *
+         * @param itemView row view
+         */
         public ShoppingItemViewHolder(@NonNull View itemView) {
             super(itemView);
 

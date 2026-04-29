@@ -36,10 +36,32 @@ public class PersonalListFragment extends Fragment {
     private DatabaseReference purchasedReference;
     private String currentUserId;
 
+    /**
+     * PersonalListFragment displays items currently assigned
+     * to the logged-in user.
+     *
+     * Users can:
+     * - Mark items as purchased
+     * - Enter purchase prices
+     * - Move items back to the shared shopping list
+     *
+     * Data is retrieved from Firebase Realtime Database.
+     */
     public PersonalListFragment() {
         super(R.layout.fragment_personal_list);
     }
 
+    /**
+     * Creates and returns the fragment view.
+     *
+     * Initializes RecyclerView, adapter, Firebase references,
+     * and loads the user's assigned items.
+     *
+     * @param inflater layout inflater
+     * @param container parent container
+     * @param savedInstanceState saved fragment state
+     * @return root fragment view
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -76,6 +98,12 @@ public class PersonalListFragment extends Fragment {
 
         return view;
     }
+    /**
+     * Displays a confirmation dialog before moving an item
+     * back to the shopping list.
+     *
+     * @param item item to move
+     */
     private void showMoveConfirmationDialog(ShoppingItem item) {
 
         new android.app.AlertDialog.Builder(getContext())
@@ -88,6 +116,11 @@ public class PersonalListFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Returns an assigned item back to the shared shopping list.
+     *
+     * @param item item being returned
+     */
     private void moveItemToShoppingList(ShoppingItem item) {
         if (item.getKey() == null) return;
 
@@ -109,6 +142,12 @@ public class PersonalListFragment extends Fragment {
                 );
     }
 
+    /**
+     * Displays a dialog prompting the user
+     * to enter a purchase price.
+     *
+     * @param item item being purchased
+     */
     private void showPriceInputDialog(ShoppingItem item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Enter Price for " + item.getItemName());
@@ -136,6 +175,14 @@ public class PersonalListFragment extends Fragment {
         builder.show();
     }
 
+    /**
+     * Moves an item from shopping_items
+     * to purchased_items and stores
+     * purchase metadata.
+     *
+     * @param item item purchased
+     * @param price purchase price
+     */
     private void markItemAsPurchased(ShoppingItem item, double price) {
         if (item.getKey() == null) return;
 
@@ -169,6 +216,10 @@ public class PersonalListFragment extends Fragment {
                         Log.e(TAG, "Failed to purchase item", e));
     }
 
+    /**
+     * Loads all shopping items assigned
+     * to the current user from Firebase.
+     */
     private void loadPersonalItems() {
         shoppingReference.addValueEventListener(new ValueEventListener() {
             @Override

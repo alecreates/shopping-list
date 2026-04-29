@@ -28,6 +28,18 @@ import androidx.appcompat.app.AlertDialog;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * PurchasedListFragment displays all items that have been marked
+ * as purchased.
+ *
+ * Users can:
+ * - View purchased items
+ * - Edit item prices
+ * - Move items back to the shopping list
+ * - View the total purchase cost
+ *
+ * Data is stored in Firebase Realtime Database.
+ */
 public class PurchasedListFragment extends Fragment {
 
     private static final String TAG = "PurchasedListFragment";
@@ -42,6 +54,17 @@ public class PurchasedListFragment extends Fragment {
         super(R.layout.fragment_purchased_list);
     }
 
+    /**
+     * Creates and returns the fragment view.
+     *
+     * Initializes RecyclerView, adapter, Firebase references,
+     * and loads purchased items.
+     *
+     * @param inflater layout inflater
+     * @param container parent container
+     * @param savedInstanceState saved fragment state
+     * @return root fragment view
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -78,7 +101,12 @@ public class PurchasedListFragment extends Fragment {
         return view;
     }
 
-
+    /**
+     * Displays a dialog allowing the user
+     * to edit an item's price.
+     *
+     * @param item item to update
+     */
     private void showEditPriceDialog(ShoppingItem item) {
         if (getContext() == null || item == null) return;
 
@@ -122,6 +150,12 @@ public class PurchasedListFragment extends Fragment {
         builder.show();
     }
 
+    /**
+     * Updates the stored price of a purchased item.
+     *
+     * @param item item to update
+     * @param newPrice new item price
+     */
     private void updateItemPrice(ShoppingItem item, double newPrice) {
         if (item.getKey() == null) return;
 
@@ -137,6 +171,12 @@ public class PurchasedListFragment extends Fragment {
                         Log.e(TAG, "Failed to update price", e));
     }
 
+    /**
+     * Displays a confirmation dialog before
+     * moving an item back to the shopping list.
+     *
+     * @param item item to move
+     */
     private void showMoveConfirmationDialog(ShoppingItem item) {
 
         new android.app.AlertDialog.Builder(getContext())
@@ -149,6 +189,12 @@ public class PurchasedListFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Moves a purchased item back to the
+     * active shopping list.
+     *
+     * @param item item being moved
+     */
     private void moveItemToShoppingList(ShoppingItem item) {
         if (item.getKey() == null) return;
 
@@ -177,7 +223,10 @@ public class PurchasedListFragment extends Fragment {
                 );
     }
 
-
+    /**
+     * Loads purchased items from Firebase
+     * and calculates the running total.
+     */
     private void loadPurchasedItems() {
         purchasedReference.addValueEventListener(new ValueEventListener() {
             @Override

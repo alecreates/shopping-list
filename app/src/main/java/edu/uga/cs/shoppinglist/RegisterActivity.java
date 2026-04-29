@@ -17,6 +17,18 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import android.util.Log;
 import android.widget.Toast;
 
+/**
+ * RegisterActivity allows new users to create an account
+ * using Firebase Authentication.
+ *
+ * Users must provide:
+ * - Display name
+ * - Email address
+ * - Password
+ *
+ * After successful registration, the user's display name is
+ * stored in Firebase and they are redirected to LogInActivity.
+ */
 public class RegisterActivity extends AppCompatActivity {
 
     EditText displayNameEditText;
@@ -25,6 +37,14 @@ public class RegisterActivity extends AppCompatActivity {
     Button registerButton;
     private FirebaseAuth mAuth;
 
+    /**
+     * Called when the activity is first created.
+     *
+     * Initializes UI components, enables edge-to-edge layout,
+     * and sets up the registration button listener.
+     *
+     * @param savedInstanceState previously saved activity state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,8 +77,17 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Creates a new user account using Firebase Authentication.
+     *
+     * Also updates the user's Firebase profile with a display name.
+     * On success, navigates to the login screen.
+     *
+     * @param name display name of the user
+     * @param email email address
+     * @param password password
+     */
     private void registerUser(String name, String email, String password) {
-
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(RegisterActivity.this, task -> {
                     if (task.isSuccessful()) {

@@ -21,14 +21,36 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
 
+/**
+ * HomePageActivity serves as the main screen of the Shopping List application.
+ *
+ * It provides:
+ * - A navigation drawer for menu actions such as logout
+ * - A toolbar with action items
+ * - A tabbed interface using ViewPager2 for navigating between fragments
+ *
+ * Tabs include Shopping, Purchased, and Summary views.
+ */
 public class HomePageActivity extends AppCompatActivity {
-
+    /** Layout used for the side navigation drawer. */
     DrawerLayout drawerLayout;
+    /** Navigation menu displayed inside the drawer. */
     NavigationView navigationView;
+    /** Tab layout used for switching between fragments. */
     TabLayout tabLayout;
+    /** ViewPager used to host tab fragments. */
     ViewPager2 viewPager;
+    /** Toggle button that opens and closes the navigation drawer. */
     ActionBarDrawerToggle drawerToggle;
 
+    /**
+     * Called when the activity is first created.
+     *
+     * Initializes the toolbar, drawer navigation, tab layout,
+     * and ViewPager adapter.
+     *
+     * @param savedInstanceState previously saved state of the activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,12 +98,29 @@ public class HomePageActivity extends AppCompatActivity {
         ).attach();
     }
 
+    /**
+     * Inflates the options menu shown in the toolbar.
+     *
+     * @param menu the options menu
+     * @return true if the menu is created successfully
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.home_menu, menu);
         return true;
     }
 
+    /**
+     * Handles toolbar menu item selections.
+     *
+     * Supports:
+     * - Drawer toggle button
+     * - Logout action
+     * - Cart navigation action
+     *
+     * @param item selected menu item
+     * @return true if the selection was handled
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (drawerToggle.onOptionsItemSelected(item)) {
@@ -99,6 +138,13 @@ public class HomePageActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Signs the user out of Firebase authentication
+     * and returns them to the main login screen.
+     *
+     * Clears the activity stack so the user cannot
+     * navigate back after logging out.
+     */
     private void logout() {
         FirebaseAuth.getInstance().signOut();
         Intent intent = new Intent(HomePageActivity.this, MainActivity.class);

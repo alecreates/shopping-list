@@ -27,6 +27,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * SummaryFragment displays spending analytics for all roommates.
+ *
+ * <p>This fragment:
+ * <ul>
+ *     <li>Aggregates total spending from purchased items</li>
+ *     <li>Computes per-roommate spending totals</li>
+ *     <li>Calculates average spending across roommates</li>
+ *     <li>Displays per-user balance differences</li>
+ *     <li>Allows clearing all purchase history ("settling")</li>
+ * </ul>
+ *
+ * Data is read from Firebase Realtime Database (purchased_items node).
+ * </p>
+ */
 public class SummaryFragment extends Fragment {
 
     private static final String TAG = "SummaryFragment";
@@ -44,6 +59,17 @@ public class SummaryFragment extends Fragment {
         super(R.layout.fragment_summary);
     }
 
+    /**
+     * Creates and returns the fragment view.
+     *
+     * Initializes UI components, RecyclerView, Firebase reference,
+     * and loads summary data.
+     *
+     * @param inflater layout inflater
+     * @param container parent container
+     * @param savedInstanceState saved state
+     * @return root fragment view
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -68,6 +94,12 @@ public class SummaryFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Loads purchased item data from Firebase and computes:
+     * - Total spending
+     * - Spending per roommate
+     * - Average spending
+     */
     private void loadSummaryData() {
         purchasedReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -109,6 +141,9 @@ public class SummaryFragment extends Fragment {
         });
     }
 
+    /**
+     * Shows a confirmation dialog before clearing purchase history.
+     */
     private void showSettleConfirmationDialog() {
         new AlertDialog.Builder(getContext())
                 .setTitle("Settle Purchases")
@@ -118,13 +153,18 @@ public class SummaryFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Deletes all purchased items from Firebase.
+     */
     private void settlePurchases() {
         purchasedReference.removeValue()
                 .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Purchases settled and cleared", Toast.LENGTH_SHORT).show())
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to clear purchases", e));
     }
 
-    // Inner classes for RecyclerView
+    /**
+     * Model class representing spending summary for a roommate.
+     */
     private static class RoommateSummary {
         String name;
         double spent;
@@ -137,6 +177,9 @@ public class SummaryFragment extends Fragment {
         }
     }
 
+    /**
+     * RecyclerView adapter for displaying roommate summaries.
+     */
     private static class RoommateSummaryAdapter extends RecyclerView.Adapter<RoommateSummaryAdapter.ViewHolder> {
         private List<RoommateSummary> summaries;
 
@@ -172,7 +215,9 @@ public class SummaryFragment extends Fragment {
 
         static class ViewHolder extends RecyclerView.ViewHolder {
             TextView name, spent, difference;
-
+            /**
+             * ViewHolder for roommate summary rows.
+             */
             ViewHolder(View itemView) {
                 super(itemView);
                 name = itemView.findViewById(R.id.roommateNameTextView);

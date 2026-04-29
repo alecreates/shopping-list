@@ -1,5 +1,13 @@
 package edu.uga.cs.shoppinglist;
 
+/**
+ * ShoppingItem represents a single item in the shopping application.
+ *
+ * It is used to store item data in Firebase Realtime Database and track:
+ * - Item identity (key, name)
+ * - Assignment to a user (shopperId, shopperName)
+ * - Purchase details (price, purchasedDate)
+ */
 public class ShoppingItem {
 
     private String key;
@@ -13,6 +21,13 @@ public class ShoppingItem {
         // Required for Firebase
     }
 
+    /**
+     * Constructs a new ShoppingItem with only a name.
+     *
+     * Default values are used for all other fields.
+     *
+     * @param itemName name of the item
+     */
     public ShoppingItem(String itemName) {
         this.itemName = itemName;
         this.shopperId = null;
@@ -20,6 +35,8 @@ public class ShoppingItem {
         this.shopperName = null;
         this.purchasedDate = 0;
     }
+
+    // getters and setters
 
     public String getKey() {
         return key;

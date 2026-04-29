@@ -20,12 +20,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
+
+/**
+ * LogInActivity allows registered users to sign in to the application
+ * using their email address and password.
+ *
+ * Authentication is handled through Firebase Authentication.
+ * After a successful login, the user is redirected to HomePageActivity.
+ */
 public class LogInActivity extends AppCompatActivity {
 
     public static final String TAG = "LogInActivity";
@@ -34,6 +37,14 @@ public class LogInActivity extends AppCompatActivity {
     Button logInButton;
     private FirebaseAuth mAuth;
 
+    /**
+     * Called when the activity is first created.
+     *
+     * Initializes UI components, enables edge-to-edge layout,
+     * and sets the login button click listener.
+     *
+     * @param savedInstanceState previously saved activity state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +78,16 @@ public class LogInActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Attempts to authenticate the user with Firebase
+     * using the provided email and password.
+     *
+     * If successful, navigates to HomePageActivity.
+     * If unsuccessful, displays an error message.
+     *
+     * @param email user's email address
+     * @param password user's password
+     */
     private void loginUser(String email, String password) {
         mAuth.signInWithEmailAndPassword( email, password )
                 .addOnCompleteListener(LogInActivity.this, new OnCompleteListener<AuthResult>() {

@@ -5,6 +5,7 @@
         android:id="@+id/action_cart"
         android:icon="@drawable/ic_shopping_cart"
         android:title="My Cart"
+        android:tint="@android:color/white"
         app:showAsAction="always" />
     <item
         android:id="@+id/logout"
